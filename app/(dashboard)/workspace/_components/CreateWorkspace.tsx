@@ -1,25 +1,45 @@
 "use client"
-import { workspaceSchema } from "@/app/schemas/workspace";
+import { WorksapceSchemaType, workspaceSchema } from "@/app/schemas/workspace";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { orpc } from "@/lib/orpc";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function CreateWorkspace(){
     const [open,setopen]=useState(false);
+    const queryClient=useQueryClient();
     const form = useForm({
-        resolver: zodResolver(workspaceSchema),
+        resolver: zodResolver(workspaceSchema as any),
+   
         defaultValues:{
             name: ""
         }
     });
-      function onSubmit() {
-        console.log("data")
+    const createWorksapceMutation=useMutation(
+        orpc.workspace.create.mutationOptions({
+            onSuccess:(newWorspace)=>{
+                toast.success(`Workspace ${newWorspace.workspaceName} created susscessfully`);
+                queryClient.invalidateQueries({
+                    queryKey: orpc.workspace.list.queryKey(),
+                });
+                form.reset();
+                setopen(false);
+            },
+            onError: ()=>{
+                toast.error("Falied to create Workspace try again!");
+            }
+        })
+    )
+      function onSubmit(values:WorksapceSchemaType) {
+        createWorksapceMutation.mutate(values)
       };
     return(
         //This open lets us control the state rather than shadcnui
@@ -56,7 +76,9 @@ export default function CreateWorkspace(){
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <Button type="submit"> Create Workspace</Button>
+                        <Button disabled={createWorksapceMutation.isPending} type="submit">
+                            {createWorksapceMutation.isPending ? 'Creating...' : 'Create Workspace'}
+                        </Button>
                     </form>
                 </Form>
             </DialogHeader>
