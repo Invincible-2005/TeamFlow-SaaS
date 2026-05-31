@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@arcjet/inspect": "^1.4.0",
+    "@arcjet/next": "^1.4.0",
     "@hookform/resolvers": "^5.4.0",
     "@kinde-oss/kinde-auth-nextjs": "^2.12.2",
     "@kinde/management-api-js": "^0.17.0",
