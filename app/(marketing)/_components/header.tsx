@@ -1,12 +1,12 @@
 'use client'
 import Link from 'next/link'
-import Logo from '@/public/logo.png'
 import { Menu, X } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
+import Logo from '@/public/logo.png'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import {RegisterLink, LoginLink, LogoutLink} from "@kinde-oss/kinde-auth-nextjs/components";
+import { RegisterLink, LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs'
 const menuItems = [
     { name: 'Features', href: '#link' },
@@ -18,8 +18,8 @@ const menuItems = [
 export const HeroHeader = () => {
     const [menuState, setMenuState] = React.useState(false);
     const [isScrolled, setIsScrolled] = React.useState(false);
-    const {getUser,isLoading}=useKindeBrowserClient();
-    const user=getUser();
+    const { getUser, isLoading } = useKindeBrowserClient();
+    const user = getUser();
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -90,39 +90,39 @@ export const HeroHeader = () => {
                             </div>
                             {isLoading ? null : (
                                 <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                                {user ? (
-                                    <>
-                                    <Link className={buttonVariants({
-                                        size:'sm'
-                                    })} 
-                                    href='/workspace'>
-                                    <span>Dashboard</span></Link>
-                                    <LogoutLink className={buttonVariants({
-                                        size:'sm',
-                                        variant:'outline'
-                                    })}>
-                                        <span>LogOut</span>
-                                    </LogoutLink>
-                                    </>
-                                ):(
-                                    <>
-                                    <LoginLink className={buttonVariants({
-                                            variant:"outline",
-                                            size:'sm',
-                                            className: cn(isScrolled && 'lg:hidden')
-                                        })}>Login</LoginLink>
-                                <RegisterLink className={buttonVariants({
-                                            size:'sm',
-                                            className: cn(isScrolled && 'lg:hidden')
-                                        })}>Sign Up</RegisterLink>
-                                <div className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                <RegisterLink className={buttonVariants({
-                                            size:'sm',
-                                        })}>Get Started</RegisterLink>
+                                    {user ? (
+                                        <>
+                                            <Link className={buttonVariants({
+                                                size: 'sm'
+                                            })}
+                                                href='/workspace'>
+                                                <span>Dashboard</span></Link>
+                                            <LogoutLink className={buttonVariants({
+                                                size: 'sm',
+                                                variant: 'outline'
+                                            })}>
+                                                <span>LogOut</span>
+                                            </LogoutLink>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <LoginLink className={buttonVariants({
+                                                variant: "outline",
+                                                size: 'sm',
+                                                className: cn(isScrolled && 'lg:hidden')
+                                            })}>Login</LoginLink>
+                                            <RegisterLink className={buttonVariants({
+                                                size: 'sm',
+                                                className: cn(isScrolled && 'lg:hidden')
+                                            })}>Sign Up</RegisterLink>
+                                            <div className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                                <RegisterLink className={buttonVariants({
+                                                    size: 'sm',
+                                                })}>Get Started</RegisterLink>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
-                                </>
-                                )}
-                            </div>
                             )}
                         </div>
                     </div>

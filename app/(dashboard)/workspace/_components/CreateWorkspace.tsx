@@ -18,7 +18,7 @@ export default function CreateWorkspace() {
     const [open, setopen] = useState(false);
     const queryClient = useQueryClient();
     const form = useForm({
-        resolver: zodResolver(workspaceSchema as any),
+        resolver: zodResolver(workspaceSchema),
 
         defaultValues: {
             name: ""

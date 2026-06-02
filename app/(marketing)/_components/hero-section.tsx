@@ -7,12 +7,12 @@ import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
 import { HeroHeader } from '@/app/(marketing)/_components/header'
 import ArcjetLogo from '@/public/companies/arcjet.png'
+import VercelLogo from '@/public/companies/vercel-logo.svg'
 import KindeLogo from '@/public/companies/kinde.png'
 import MotionLogo from '@/public/companies/motion-logo.png'
 import NeondbLogo from '@/public/companies/neondb.png'
 import OrpcLogo from '@/public/companies/orpc.png'
 import PrismaLogo from '@/public/companies/prisma-logo.svg'
-import VercelLogo from '@/public/companies/vercel-logo.svg'
 import {
     Beacon,
     Bolt,
@@ -227,49 +227,50 @@ export default function HeroSection() {
                             <div className="flex items-center gap-2 justify-center">
                                 <Image 
                                 className='mx-auto h-7 object-contain rounded-full'
-                                src={ArcjetLogo} 
+                                src={ArcjetLogo}
                                 alt="Arcjet Logo" />
                                 <p>Arcjet</p>
                             </div>
                             <div className="flex items-center gap-2 justify-center">
                             <Image 
                                 className='mx-auto h-7 object-contain rounded-full'
-                                src={VercelLogo} 
+                                src={VercelLogo}
                                 alt="Vercel Logo" />
                                 <p>Vercel</p>
                             </div>
                             <div className="flex items-center gap-2 justify-center">
                             <Image 
                                 className='mx-auto h-7 object-contain rounded-full'
-                                src={KindeLogo} 
+                                src={KindeLogo}
                                 alt="Kinde Logo" />
                                 <p>Kinde</p>
                             </div>
                             <div className="flex items-center gap-2 justify-center">
                             <Image 
                                 className='mx-auto h-7 object-contain rounded-full'
-                                src={MotionLogo} 
+                                src={MotionLogo}
                                 alt="Motion Logo" />
                                 <p>Motion</p>
                             </div>
                             <div className="flex items-center gap-2 justify-center">
                             <Image 
                                 className='mx-auto h-7 object-contain rounded-full'
-                                src={NeondbLogo} 
+                                src={NeondbLogo}
                                 alt="Neondb Logo" />
                                 <p>NeonDB</p>
                             </div>
                             <div className="flex items-center gap-2 justify-center">
                             <Image 
                                 className='mx-auto h-7 object-contain rounded-full invert dark:invert-0'
-                                src={OrpcLogo} 
+                                src={OrpcLogo}
                                 alt="Orpc Logo" />
                                 <p>oRPC</p>
                             </div>
                             <div className="flex items-center gap-2 justify-center">
                             <Image 
-                                className='mx-auto h-7 object-contain rounded-full invert dark:invert-0'
-                                src={PrismaLogo} 
+                                className='mx-auto h-7 object-contain rounded-full invert dark:invert'
+                                src={PrismaLogo}
+                           
                                 alt="Prisma Logo" />
                                 <p>Prisma</p>
                             </div>
