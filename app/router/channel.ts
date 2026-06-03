@@ -7,6 +7,8 @@ import { requiredWorkspaceMiddleware } from "../middlewares/workspace";
 import { channelNameSchema } from "../schemas/channel";
 import prisma from "@/lib/db";
 import { channel } from "@/lib/generated/prisma/client";
+import { init, organization_user, Organizations } from "@kinde/management-api-js";
+import { KindeOrganization } from "@kinde-oss/kinde-auth-nextjs";
 
 export const createChannel = base
     .use(requiredAuthMiddleware)
@@ -30,3 +32,42 @@ export const createChannel = base
         });
         return channel;
     });
+export const listChannels=base
+.use(requiredAuthMiddleware)
+.use(requiredWorkspaceMiddleware)
+.route({
+    method:'GET',
+    path:'/channels',
+    summary:'List all channels',
+    tags: ['channels'],
+}).input(z.void())
+.output(z.object({
+    channels: z.array(z.custom<channel>()),
+    currentWorkspace:z.custom<KindeOrganization<unknown>>(),
+    members:z.array(z.custom<organization_user>())
+}))
+.handler(async({context})=>{
+    const[channels,members]=await Promise.all([
+        prisma.channel.findMany({
+        where:{
+            workspaceId:context.workspace.orgCode,
+        },
+        orderBy:{
+            createdAt:'desc',
+        }
+    }),
+    (async()=>{
+        init();
+    const usersinOrg=await Organizations.getOrganizationUsers({
+        orgCode:context.workspace.orgCode,
+        sort: 'name_asc',
+    });
+    return usersinOrg.organization_users ?? [];
+    })(),
+    ])
+    return{
+        channels,
+        members,
+        currentWorkspace: context.workspace,
+    }
+})

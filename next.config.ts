@@ -7,8 +7,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "avatar.vercel.sh",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com"
+      }
+      
     ],
   },
+  
 };
 
 export default nextConfig;

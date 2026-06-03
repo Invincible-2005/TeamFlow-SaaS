@@ -5,14 +5,20 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { ChannelList } from './_components/ChannelList'
 import { WorkspaceMemberList } from './_components/WorkspaceMembersList'
+import { getQueryClient, HydrateClient } from '@/lib/query/hydration'
+import { orpc } from '@/lib/orpc'
 
-const channelListLayout = ({ children }: { children: ReactNode }) => {
+const channelListLayout = async ({ children }: { children: ReactNode }) => {
+    const queryClient = getQueryClient();
+    await queryClient.prefetchQuery(orpc.channel.list.queryOptions());
     return (
         <>
             <div className='flex h-full w-80 flex-col bg-secondary border-r border-border'>
                 {/* HEADER */}
                 <div className='flex items-center px-4 h-14 border-r border-border'>
-                    <WorkspaceHeader />
+                    <HydrateClient client={queryClient}>
+                        <WorkspaceHeader />
+                    </HydrateClient>
                 </div>
                 <div className='px-4 py-2'>
                     <CreateNewChannel />
@@ -25,7 +31,9 @@ const channelListLayout = ({ children }: { children: ReactNode }) => {
                             <ChevronDown className='size-4 transition-transfrom duration-200' />
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                            <ChannelList />
+                            <HydrateClient client={queryClient}>
+                                <ChannelList />
+                            </HydrateClient>
                         </CollapsibleContent>
                     </Collapsible>
                 </div>
@@ -37,7 +45,9 @@ const channelListLayout = ({ children }: { children: ReactNode }) => {
                             <ChevronUp className='size-4 transition-transfrom duration-200' />
                         </CollapsibleTrigger>
                         <CollapsibleContent>
+                            <HydrateClient client={queryClient}>
                             <WorkspaceMemberList />
+                            </HydrateClient>
                         </CollapsibleContent>
                     </Collapsible>
                 </div>
