@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com"
+      },
+      {
+        protocol: "https",
+        hostname: "gar9ihq4g5.ufs.sh"
       }
       
     ],
