@@ -1,5 +1,5 @@
 import arcjet, { createMiddleware, detectBot } from "@arcjet/next";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { withAuth } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 const aj=arcjet({
@@ -18,17 +18,24 @@ const aj=arcjet({
 });
 
 async function existingMiddleware(req: NextRequest){
-    const {getClaim}=getKindeServerSession();
-    const orgCode=await getClaim("org_code");
-
+    const anyReq=req as {
+        nextUrl: NextRequest["nextUrl"];
+        kindeAuth?:{token?:any; user?:any};
+    };
     const url=req.nextUrl;
-    if(url.pathname.startsWith('/workspace') && !url.pathname.includes(orgCode?.value || '')){
-        url.pathname=`/workspace/${orgCode?.value}`;
+    const orgCode=anyReq.kindeAuth?.user?.org_code ||
+     anyReq.kindeAuth?.token?.org_code || 
+     anyReq.kindeAuth?.token?.claims?.org_code;
+    if(url.pathname.startsWith('/workspace') && !url.pathname.includes(orgCode || '')){
+        url.pathname=`/workspace/${orgCode}`;
         return NextResponse.redirect(url);
     }
     return NextResponse.next();
 }
-export default createMiddleware(aj, existingMiddleware);
+export default createMiddleware(aj, withAuth(existingMiddleware,{
+    publicPaths: ["/","/api/uploadthing"],
+}) as any
+);
 
 export const config={
     matcher: ["/((?!next/static|_next/image|favicon.ico|/rpc).*)"]
