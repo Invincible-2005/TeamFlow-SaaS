@@ -38,5 +38,6 @@ export default createMiddleware(aj, withAuth(existingMiddleware,{
 );
 
 export const config={
-    matcher: ["/((?!next/static|_next/image|favicon.ico|/rpc).*)"]
+    // matcher: ["/((?!next/static|_next/image|favicon.ico|/rpc).*)"]
+    matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|rpc).*)"]
 }
