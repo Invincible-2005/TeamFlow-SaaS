@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "@/lib/orpc";
 import { toast } from "sonner";
-import { Message } from "@/lib/generated/prisma/client";
 import { KindeUser } from "@kinde-oss/kinde-auth-nextjs";
 import { getAvatar } from "@/lib/get-avatar";
 import { MessageListItem } from "@/lib/types";
@@ -51,7 +50,7 @@ export function ThreadReplyForm({threadId,user}:ThreadReplyProps){
             type InfiniteMessages= InfiniteData<MessagePage>;
             await queryClient.cancelQueries({queryKey: listOptions.queryKey});
             const previous=queryClient.getQueryData(listOptions.queryKey);
-            const optimistic: Message={
+            const optimistic: MessageListItem={
                 id: `optimistic-${crypto.randomUUID()}`,
                 content: data.content,
                 createdAt: new Date(),
@@ -63,6 +62,8 @@ export function ThreadReplyForm({threadId,user}:ThreadReplyProps){
                 channelId:data.channelId,
                 threadId:data.threadId!,
                 imageUrl:data.imageUrl ?? null,
+                reactions: [],
+                replyCount: 0,
             };
             queryClient.setQueryData(
                 listOptions.queryKey,
@@ -76,7 +77,7 @@ export function ThreadReplyForm({threadId,user}:ThreadReplyProps){
                     };
                 },
             );
-            // Optimistically bump repliesCount in main message list for the parent message
+            // Optimistically bump replyCount in main message list for the parent message
             queryClient.setQueryData<InfiniteMessages>(
                 ["message.list",channelId],
                 (old)=>{
@@ -84,7 +85,7 @@ export function ThreadReplyForm({threadId,user}:ThreadReplyProps){
                     const pages=old.pages.map((page)=>({
                         ...page,
                         items: page.items.map((m)=>
-                            m.id===threadId ? {...m,repliesCount: m.repliesCount+1} : m
+                            m.id===threadId ? {...m,replyCount: m.replyCount+1} : m
                         ),
                     }));
                     return {...old,pages};
