@@ -110,15 +110,27 @@ export const HeroHeader = () => {
                                                 variant: "outline",
                                                 size: 'sm',
                                                 className: cn(isScrolled && 'lg:hidden')
-                                            })}>Login</LoginLink>
+                                            })}
+                                            >Login</LoginLink>
                                             <RegisterLink className={buttonVariants({
                                                 size: 'sm',
                                                 className: cn(isScrolled && 'lg:hidden')
-                                            })}>Sign Up</RegisterLink>
+                                            })}
+                                                authUrlParams={{
+                                                    is_create_org: 'true',
+                                                    org_name: 'My Workspace',
+                                                    pricing_table_key: 'organizations_plans'
+                                                }}>Sign Up</RegisterLink>
                                             <div className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
                                                 <RegisterLink className={buttonVariants({
                                                     size: 'sm',
-                                                })}>Get Started</RegisterLink>
+                                                })}
+                                                    authUrlParams={{
+                                                        is_create_org: 'true',
+                                                        org_name: 'My Workspace',
+                                                        pricing_table_key: 'organizations_plans'
+                                                    }}
+                                                >Get Started</RegisterLink>
                                             </div>
                                         </>
                                     )}
