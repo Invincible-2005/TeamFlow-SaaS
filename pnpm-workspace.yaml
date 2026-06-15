@@ -4,6 +4,8 @@ ignoredBuiltDependencies:
 
 onlyBuiltDependencies:
   - '@prisma/engines'
+  - esbuild
   - msgpackr-extract
   - msw
   - prisma
+  - workerd
