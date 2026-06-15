@@ -42,7 +42,28 @@ export const InviteMember=base
                 ],
             },
         });
-    }catch{
+    } catch (err: any) {
+        // If the user already exists in Kinde (status 400), we fetch them by email and add them to this organization
+        if (err.status === 400) {
+            try {
+                const usersResponse = await Users.getUsers({ email: input.email });
+                const existingUser = usersResponse.users?.[0];
+
+                if (existingUser && existingUser.id) {
+                    await Organizations.addOrganizationUsers({
+                        orgCode: context.workspace.orgCode,
+                        requestBody: {
+                            users: [{ id: existingUser.id }]
+                        }
+                    });
+                    return; // Successfully added to org
+                }
+            } catch (fallbackErr) {
+                console.error("Error trying to add existing user to organization:", fallbackErr);
+            }
+        }
+        
+        console.error("Kinde createUser error:", err);
         throw errors.INTERNAL_SERVER_ERROR();
     }
  });

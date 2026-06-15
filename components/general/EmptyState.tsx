@@ -21,9 +21,9 @@ export function EmptyState({title,description,buttontext,href}:EmptyStateProps){
             </EmptyHeader>
             <EmptyContent>
                 <Link href={href} className={buttonVariants()}>
-                <PlusCircle />
+                    <PlusCircle className="mr-2 size-4" />
+                    {buttontext}
                 </Link>
-                {buttontext}
             </EmptyContent>
         </Empty>
     )
