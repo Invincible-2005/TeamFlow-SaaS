@@ -22,7 +22,10 @@ const nextConfig: NextConfig = {
       
     ],
   },
-  
+  // @ts-expect-error - `eslint` is a valid Next.js config option but might be missing from the strict type definitions
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

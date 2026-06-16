@@ -1,6 +1,6 @@
 // index.ts
 
-import { ChannelEventSchema, PresenceMessageSchema, UserSchema } from "@/app/schemas/realtime";
+import { ChannelEventSchema, PresenceMessageSchema, ThreadEventSchema, UserSchema } from "@/app/schemas/realtime";
 import { Connection, routePartykitRequest, Server } from "partyserver";
 import z from "zod";
 
@@ -57,6 +57,14 @@ export class Chat extends Server {
         if(channelEvent.success){
           const payload=JSON.stringify(channelEvent.data);
           this.broadcast(payload,[connection.id]); // we only only bradcast and not check for any specific user because like how the last one is to update state this one has one logic for messages
+          return;
+        }
+        
+        //Thread events
+        const threadEvents=ThreadEventSchema.safeParse(parsed);
+        if(threadEvents.success){
+          const payload=JSON.stringify(threadEvents.data);
+          this.broadcast(payload,[connection.id]);
           return;
         }
     }catch(error){

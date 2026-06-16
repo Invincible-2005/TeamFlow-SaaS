@@ -14,14 +14,7 @@ import NeondbLogo from '@/public/companies/neondb.png'
 import OrpcLogo from '@/public/companies/orpc.png'
 import PrismaLogo from '@/public/companies/prisma-logo.svg'
 import {
-    Beacon,
-    Bolt,
     Claude,
-    FirebaseFull,
-    Hulu,
-    Spotify,
-    SupabaseFull,
-    VercelFull,
 } from '@/components/ui/svgs'
 
 const APP_SCREEN_IMAGE =

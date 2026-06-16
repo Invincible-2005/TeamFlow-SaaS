@@ -10,7 +10,7 @@ interface usePresenceProps{
 export function usePresence({room,currentUser}:usePresenceProps){
     const [onlineUsers,setOnlineUsers]=useState<User[]>([]);
     const socket=usePartySocket({
-        host: 'http://127.0.0.1:8787',
+        host: 'https://teamflow-chat-realtime.piyushkum2005.workers.dev',
         room: room,
         party: 'chat',
         onOpen(){

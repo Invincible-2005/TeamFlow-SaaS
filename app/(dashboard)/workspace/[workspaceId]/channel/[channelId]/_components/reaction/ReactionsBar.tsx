@@ -10,6 +10,7 @@ import { MessageListItem } from "@/lib/types";
 
 import { QueryKey } from "@tanstack/react-query";
 import { useChannelRealTime } from "@/providers/ChannelRealtimeProvider";
+import { useOptionalThreadRealtime } from "@/providers/ThreadRealtimeProvider";
 interface ReactionContext {
     prevThread?: {
         parent: MessageListItem;
@@ -39,6 +40,7 @@ export function ReactionsBar({messageId,reactions,context}:ReactionBarProps){
     const {channelId}=useParams<{channelId:string}>();
     const queryClient=useQueryClient();
     const {send}=useChannelRealTime();
+    const threadRealtime=useOptionalThreadRealtime();
     const toggleMutation=useMutation(orpc.message.reaction.toogle.mutationOptions({
         onMutate: async(vars:{messageId:string;emoji:string})=>{
             const bump=(rxns: GroupedReactionSchemaType[])=>{
@@ -114,7 +116,14 @@ export function ReactionsBar({messageId,reactions,context}:ReactionBarProps){
             send({
                 type: "reaction:updated",
                 payload: data,
-            })
+            });
+            if(context && context.type==='thread' && threadRealtime){
+                const threadId=context.threadId;
+                threadRealtime.send({
+                    type: "thread:reaction:updated",
+                    payload: {...data,threadId},
+                })
+            }
             return toast.success("Emoji Added");
         },
         onError:(_err,_var,ctx: ReactionContext | undefined)=>{

@@ -1,6 +1,5 @@
 import { KindeOrganization, KindeUser } from '@kinde-oss/kinde-auth-nextjs';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { os } from '@orpc/server'
 import { z } from 'zod'
 import { base } from '../middlewares/base';
 import { requiredAuthMiddleware } from '../middlewares/auth';

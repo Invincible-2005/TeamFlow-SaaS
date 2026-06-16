@@ -11,6 +11,7 @@ import { KindeUser } from "@kinde-oss/kinde-auth-nextjs";
 import { ThreadSidebarSkeleton } from "./ThreadSidebarSkeleton";
 import { useEffect, useRef, useState } from "react";
 import { SummarizeThread } from "./SummarizeThread";
+import { ThreadRealtimeProvider } from "@/providers/ThreadRealtimeProvider";
 interface ThreadSidebarProps{
     user: KindeUser<Record<string,unknown>>;
 }
@@ -98,7 +99,8 @@ export function ThreadSidebar({user}:ThreadSidebarProps) {
         return <ThreadSidebarSkeleton />;
     }
     return (
-        <div className="w-120 border-l flex flex-col h-full">
+        <ThreadRealtimeProvider threadId={selectedThreadId!}>
+            <div className="w-120 border-l flex flex-col h-full">
             {/* Header */}
             <div className="border-b h-14 px-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -171,5 +173,6 @@ export function ThreadSidebar({user}:ThreadSidebarProps) {
                 <ThreadReplyForm threadId={selectedThreadId!} user={user} />
             </div>
         </div>
+        </ThreadRealtimeProvider>
     )
 }

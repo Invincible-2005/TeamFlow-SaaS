@@ -42,9 +42,9 @@ export const InviteMember=base
                 ],
             },
         });
-    } catch (err: any) {
+    } catch (err: unknown) {
         // If the user already exists in Kinde (status 400), we fetch them by email and add them to this organization
-        if (err.status === 400) {
+        if (err && typeof err === 'object' && 'status' in err && err.status === 400) {
             try {
                 const usersResponse = await Users.getUsers({ email: input.email });
                 const existingUser = usersResponse.users?.[0];
