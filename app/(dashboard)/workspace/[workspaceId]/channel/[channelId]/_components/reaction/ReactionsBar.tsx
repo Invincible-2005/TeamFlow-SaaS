@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { MessageListItem } from "@/lib/types";
 
 import { QueryKey } from "@tanstack/react-query";
+import { useChannelRealTime } from "@/providers/ChannelRealtimeProvider";
 interface ReactionContext {
     prevThread?: {
         parent: MessageListItem;
@@ -37,6 +38,7 @@ type InfiniteReplies=InfiniteData<MessagePage>;
 export function ReactionsBar({messageId,reactions,context}:ReactionBarProps){
     const {channelId}=useParams<{channelId:string}>();
     const queryClient=useQueryClient();
+    const {send}=useChannelRealTime();
     const toggleMutation=useMutation(orpc.message.reaction.toogle.mutationOptions({
         onMutate: async(vars:{messageId:string;emoji:string})=>{
             const bump=(rxns: GroupedReactionSchemaType[])=>{
@@ -108,7 +110,11 @@ export function ReactionsBar({messageId,reactions,context}:ReactionBarProps){
                 prev,listKey,
             }
         },
-        onSuccess:()=>{
+        onSuccess:(data)=>{
+            send({
+                type: "reaction:updated",
+                payload: data,
+            })
             return toast.success("Emoji Added");
         },
         onError:(_err,_var,ctx: ReactionContext | undefined)=>{
