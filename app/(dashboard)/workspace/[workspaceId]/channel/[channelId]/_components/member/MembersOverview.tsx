@@ -5,17 +5,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { orpc } from "@/lib/orpc";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Users } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MemberItem } from "./MemberItem";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePresence } from "@/hooks/use-presence";
+import { User } from "@/app/schemas/realtime";
+import { useParams } from "next/navigation";
 
 export function MembersOverview(){
+    const params=useParams();
+    const workspaceId=params.workspaceId;
     const [open,setOpen]=useState(false);
     const [search,setSearch]=useState('');
     const {data, isLoading,error}=useQuery(orpc.workspace.member.list.queryOptions());
-    if(error){
-        return <h1>Error: {error.message}</h1>
-    }
+    const {data: workspaceData}=useQuery(orpc.workspace.list.queryOptions());
     const members=data ?? [];
     const query=search.trim().toLowerCase();
     const filteredMembers=query? members.filter((m)=>{
@@ -23,6 +26,23 @@ export function MembersOverview(){
         const email=m.email?.toLowerCase();
         return name?.includes(query) || email?.includes(query);
     }): members;
+    const currentUser=useMemo(()=>{
+        if(!workspaceData?.user) return null;
+        return {
+            id: workspaceData.user.id,
+            full_name: workspaceData.user.given_name,
+            email: workspaceData.user.email,
+            picture: workspaceData.user.picture,
+        } satisfies User;
+    },[workspaceData?.user]);
+    const { onlineUsers }=usePresence({
+        room:`workspace-${workspaceId}`,
+        currentUser: currentUser,
+    });
+    const onlineUsersIds=useMemo(()=>new Set(onlineUsers.map((u)=>u.id)),[onlineUsers]);
+    if(error){
+        return <h1>Error: {error.message}</h1>
+    }
     return( 
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -61,7 +81,7 @@ export function MembersOverview(){
                             <p className="text-sm px-4 py-6 text-muted-foreground">No Members Found</p>
                         ):(
                             filteredMembers.map((m)=>(
-                                <MemberItem member={m} key={m.id} />
+                                <MemberItem member={m} key={m.id} isOnline={m.id ? onlineUsersIds.has(m.id): false} />
                             ))
                         )}
                         {/* {data?.map((member)=>(
