@@ -1,4 +1,4 @@
-import React from 'react'
+"use client"
 import Link from 'next/link'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,9 +16,9 @@ import PrismaLogo from '@/public/companies/prisma-logo.svg'
 import {
     Claude,
 } from '@/components/ui/svgs'
+import APP_SCREEN_IMAGE from "@/public/app-screen.png"
+import { LoginLink, useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs'
 
-const APP_SCREEN_IMAGE =
-    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2700&auto=format&fit=crop'
 
 const transitionVariants = {
     item: {
@@ -41,6 +41,8 @@ const transitionVariants = {
 }
 
 export default function HeroSection() {
+    const { getUser, isLoading } = useKindeBrowserClient();
+    const user = getUser();
     return (
         <>
             <HeroHeader />
@@ -145,29 +147,42 @@ export default function HeroSection() {
                                         },
                                         ...transitionVariants,
                                     }}
-                                    className="mt-12 flex flex-col items-center justify-center gap-5 md:flex-row">
-                                    <div
-                                        key={1}
-                                        className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
-                                        <Button
-                                            asChild
-                                            size="lg"
-                                            className="rounded-xl px-5 text-base">
-                                            <Link href="#link">
-                                                <span className="text-nowrap">Get Started</span>
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                    <Button
-                                        key={2}
-                                        asChild
-                                        size="lg"
-                                        variant="secondary"
-                                        className="h-10.5 rounded-xl px-5">
-                                        <Link href="#link">
-                                            <span className="text-nowrap">Request a demo</span>
-                                        </Link>
-                                    </Button>
+                                    className="mt-12">
+                                    {isLoading ? null : (
+                                        <div className="flex flex-row items-center justify-center gap-4">
+                                            {user ? (
+                                                <Button
+                                                    key={1}
+                                                    asChild
+                                                    size="lg"
+                                                    className="rounded-xl px-5 text-base">
+                                                    <Link href="/workspace">
+                                                        <span className="text-nowrap">Get Started</span>
+                                                    </Link>
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    key={1}
+                                                    asChild
+                                                    size="lg"
+                                                    className="rounded-xl px-5 text-base">
+                                                    <LoginLink>
+                                                        <span className="text-nowrap">Get Started</span>
+                                                    </LoginLink>
+                                                </Button>
+                                            )}
+                                            <Button
+                                                key={2}
+                                                asChild
+                                                size="lg"
+                                                variant="secondary"
+                                                className="h-10.5 rounded-xl px-5">
+                                                <Link href="#link">
+                                                    <span className="text-nowrap">Request a demo</span>
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    )}
                                 </AnimatedGroup>
                             </div>
                         </div>

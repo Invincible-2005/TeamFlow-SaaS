@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TeamFlow SaaS
 
-## Getting Started
+TeamFlow is an AI-ready home for team communication. It organizes conversations into channels with threads, operates in real-time, and uses AI to keep teams in sync.
 
-First, run the development server:
+## Prerequisites
+
+Before you begin, ensure you have the following installed on your machine:
+- **Node.js** (v18 or higher)
+- **pnpm** (Package manager used for this project)
+- **PostgreSQL** database (or a cloud provider like NeonDB/Supabase)
+
+## Setup Instructions
+
+Follow these steps to successfully set up and run the application locally:
+
+### 1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd TeamFlow-SaaS
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Run the following command to install all the required packages. (This will also automatically run `prisma generate` to generate the Prisma client).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+```
 
-## Learn More
+### 3. Configure Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Create a `.env` file in the root of your project by copying the provided example or creating a new one. You will need to fill in the following keys:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+# --- Kinde Authentication ---
+# Get these from your Kinde dashboard (https://kinde.com)
+KINDE_CLIENT_ID=
+KINDE_CLIENT_SECRET=
+KINDE_ISSUER_URL=
+KINDE_SITE_URL=http://localhost:3000
+KINDE_POST_LOGOUT_REDIRECT_URL=http://localhost:3000
+KINDE_POST_LOGIN_REDIRECT_URL=http://localhost:3000/workspace
+KINDE_DOMAIN=
+# Kinde Management API for creating orgs/users
+KINDE_MANAGEMENT_CLIENT_ID=
+KINDE_MANAGEMENT_CLIENT_SECRET=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# --- Arcjet Security ---
+# Get this from your Arcjet dashboard (https://arcjet.com)
+ARCJET_KEY=
 
-## Deploy on Vercel
+# --- Database ---
+# Your PostgreSQL connection string (e.g., from NeonDB)
+DATABASE_URL=
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# --- UploadThing ---
+# For handling file/image uploads (https://uploadthing.com)
+UPLOADTHING_TOKEN=
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# --- AI / LLM ---
+# OpenRouter API key for AI features
+LLM_KEY=
+```
+
+### 4. Setup the Database
+
+Push the Prisma schema to your PostgreSQL database to create the necessary tables:
+
+```bash
+npx prisma db push
+```
+
+*(Note: The Prisma client is already generated during `pnpm install`, but you can run `npx prisma generate` manually if needed).*
+
+### 5. Start the Development Server
+
+Start the local Next.js development server:
+
+```bash
+pnpm dev
+```
+
+### 6. Access the App
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result. You can now log in, create a workspace, and start using the app!
+
