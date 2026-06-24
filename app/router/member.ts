@@ -9,6 +9,35 @@ import { init, organization_user, Organizations, Users } from "@kinde/management
 import { getAvatar } from "@/lib/get-avatar";
 import { readSecurityMiddleware } from "../middlewares/arcjet/read";
 
+type KindeApiError = {
+    status?: number;
+};
+
+function getKindeErrorStatus(error: unknown) {
+    return typeof error === "object" && error !== null && "status" in error
+        ? (error as KindeApiError).status
+        : undefined;
+}
+
+async function getKindeUserByEmail(email: string) {
+    const usersResponse = await Users.getUsers({
+        email,
+        expand: "organizations",
+        pageSize: 1,
+    });
+
+    return usersResponse.users?.find((user) => user.email?.toLowerCase() === email) ?? usersResponse.users?.[0];
+}
+
+async function addExistingUserToWorkspace(userId: string, orgCode: string) {
+    await Organizations.addOrganizationUsers({
+        orgCode,
+        requestBody: {
+            users: [{ id: userId }],
+        },
+    });
+}
+
 export const InviteMember=base
  .use(requiredAuthMiddleware)
  .use(requiredWorkspaceMiddleware)
@@ -23,6 +52,7 @@ export const InviteMember=base
  .input(inviteMemberSchema)
  .output(z.void())
  .handler(async({input,context,errors})=>{
+    const email=input.email.trim().toLowerCase();
     try{
         init();
         await Users.createUser({
@@ -30,40 +60,50 @@ export const InviteMember=base
                 organization_code:context.workspace.orgCode,
                 profile:{
                     given_name: input.name,
-                    picture: getAvatar(null,input.email),
+                    picture: getAvatar(null,email),
                 },
                 identities: [
                     {
                         type: "email",
                         details: {
-                            email: input.email,
+                            email,
                         },
                     },
                 ],
             },
         });
     } catch (err: unknown) {
-        // If the user already exists in Kinde (status 400), we fetch them by email and add them to this organization
-        if (err && typeof err === 'object' && 'status' in err && err.status === 400) {
+        // Existing Kinde users must be looked up by id before they can be added to an organization.
+        if (getKindeErrorStatus(err) === 400) {
             try {
-                const usersResponse = await Users.getUsers({ email: input.email });
-                const existingUser = usersResponse.users?.[0];
+                const existingUser = await getKindeUserByEmail(email);
 
                 if (existingUser && existingUser.id) {
-                    await Organizations.addOrganizationUsers({
-                        orgCode: context.workspace.orgCode,
-                        requestBody: {
-                            users: [{ id: existingUser.id }]
-                        }
-                    });
-                    return; // Successfully added to org
+                    if(existingUser.organizations?.includes(context.workspace.orgCode)){
+                        return;
+                    }
+
+                    await addExistingUserToWorkspace(existingUser.id,context.workspace.orgCode);
+                    return;
                 }
             } catch (fallbackErr) {
+                if(getKindeErrorStatus(fallbackErr) === 403){
+                    throw errors.FORBIDDEN({
+                        message: "Kinde Management API needs the read:users scope to invite existing users.",
+                    });
+                }
+
                 console.error("Error trying to add existing user to organization:", fallbackErr);
             }
         }
         
-        console.error("Kinde createUser error:", err);
+        if(getKindeErrorStatus(err) === 403){
+            throw errors.FORBIDDEN({
+                message: "Kinde Management API credentials are missing a required user or organization scope.",
+            });
+        }
+
+        console.error("Kinde invite member error:", err);
         throw errors.INTERNAL_SERVER_ERROR();
     }
  });

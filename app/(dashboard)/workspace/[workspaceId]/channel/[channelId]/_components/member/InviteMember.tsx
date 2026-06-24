@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { orpc } from "@/lib/orpc";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 export default function InviteMember(){
     const [open,setOpen]=useState(false);
+    const queryClient=useQueryClient();
     const form=useForm({
         resolver: zodResolver(inviteMemberSchema),
         defaultValues:{
@@ -24,6 +25,12 @@ export default function InviteMember(){
     const inviteMutation= useMutation(orpc.workspace.member.invite.mutationOptions({
         onSuccess: ()=>{
             toast.success("Invitation send successfully!");
+            queryClient.invalidateQueries({
+                queryKey: orpc.workspace.member.list.queryKey(),
+            });
+            queryClient.invalidateQueries({
+                queryKey: orpc.channel.list.queryKey(),
+            });
             form.reset();
             setOpen(false);
         },
@@ -74,7 +81,7 @@ export default function InviteMember(){
                         render={({field})=>(
                             <FormItem>
                                 <FormLabel>
-                                    Name
+                                    Email
                                 </FormLabel>
                                 <FormControl>
                                     <Input placeholder="Enter Email..." {...field} />
@@ -83,7 +90,9 @@ export default function InviteMember(){
                             </FormItem>
                         )}
                         />
-                        <Button type="submit">Send Invitation</Button>
+                        <Button disabled={inviteMutation.isPending} type="submit">
+                            {inviteMutation.isPending ? "Sending..." : "Send Invitation"}
+                        </Button>
                     </form>
                 </Form>
             </DialogContent>
